@@ -19,7 +19,7 @@ func (s *server) CreateParty(ctx context.Context, in *api.PartyRequest) (*api.Pa
 	log.Println(in.Party.Gender)
 	log.Println(in.Party.Phones[0].Number)
 	log.Println(in.Party.Phones[0].Type)
-	return &api.PartyResponse{PartyId: 122345}, nil
+	return &api.PartyResponse{PartyId: 122345}, nil 
 }
 
 func main() {
