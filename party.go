@@ -2,34 +2,41 @@ package main
 
 import (
 	"context"
-	"github.com/kubesure/api"
+	"github.com/kubesure/party/api/v1"
+	service "github.com/kubesure/party/service/v1"
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"os"
+	"os/signal"
 )
 
 const (
 	port = ":50051"
 )
 
-type server struct{}
-
-func (s *server) CreateParty(ctx context.Context, in *api.PartyRequest) (*api.PartyResponse, error) {
-	log.Println(in.Party.FirstName)
-	log.Println(in.Party.Gender)
-	log.Println(in.Party.Phones[0].Number)
-	log.Println(in.Party.Phones[0].Type)
-	return &api.PartyResponse{PartyId: 122345}, nil 
-}
-
+//GRPc to be channel driven
 func main() {
-	log.Println("party server on")
+	log.Println("party server on...")
+	ctx := context.Background()
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
 	s := grpc.NewServer()
-	api.RegisterPartyServiceServer(s, &server{})
+	party.RegisterPartyServiceServer(s, &service.Server{})
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+
+	go func() {
+		for range c {
+			log.Print("shutting down party server...")
+			s.GracefulStop()
+			<- ctx.Done()
+		}
+	}()
+
 	s.Serve(lis)
 }
