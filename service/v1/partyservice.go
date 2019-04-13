@@ -6,9 +6,10 @@ import (
 	"log"
 )
 
+//Server to host a party service
 type Server struct{}
 
-//SearchParty search a party by party details supplied
+//CreateParty creates a party
 func (s *Server) CreateParty(ctx context.Context, in *party.PartyRequest) (*party.PartyResponse, error) {
 	log.Println(in.Party.FirstName)
 	log.Println(in.Party.Gender)
