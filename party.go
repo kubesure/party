@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"github.com/kubesure/party/api/v1"
+	api "github.com/kubesure/party/api/v1"
 	service "github.com/kubesure/party/service/v1"
 	"google.golang.org/grpc"
 	"log"
@@ -15,7 +15,6 @@ const (
 	port = ":50051"
 )
 
-//GRPc to be channel driven
 func main() {
 	log.Println("party server on...")
 	ctx := context.Background()
@@ -25,7 +24,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	party.RegisterPartyServiceServer(s, &service.Server{})
+	api.RegisterPartyServiceServer(s, &service.PartyService{})
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
@@ -34,9 +33,8 @@ func main() {
 		for range c {
 			log.Print("shutting down party server...")
 			s.GracefulStop()
-			<- ctx.Done()
+			<-ctx.Done()
 		}
 	}()
-
 	s.Serve(lis)
 }
