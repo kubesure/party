@@ -24,7 +24,8 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	api.RegisterPartyServiceServer(s, &service.PartyService{})
+	svc := &service.PartyService{}
+	api.RegisterPartyServiceServer(s, svc)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)

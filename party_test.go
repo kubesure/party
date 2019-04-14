@@ -1,10 +1,11 @@
 package main
 
 import (
-	p "github.com/kubesure/api"
-	"golang.org/x/net/context"
-	"google.golang.org/grpc"
-	"log"
+	p "github.com/kubesure/party/api/v1"
+	service "github.com/kubesure/party/service/v1"
+	//"golang.org/x/net/context"
+	//"google.golang.org/grpc"
+	//"log"
 	"testing"
 )
 
@@ -12,7 +13,31 @@ const (
 	address = "localhost:50051"
 )
 
-func TestPartyCreate(t *testing.T) {
+func data() *p.PartyRequest {
+	party := p.Party{FirstName: "Gopher bikertales", LastName: "Patel", Gender: p.Party_MALE,
+		Email: "pras.p.in@gmail.com", PanNumber: "ABJPP2406G", Aadhaar: 123456789012, DataOfBirth: "14/01/1977",
+		AddressLine1: "Ketaki", AddressLine2: "Maneklal", AddressLine3: "Ghatkopar",
+		PinCode: 4000086, City: "Mumbai", Latitude: 1212122.333, Longitude: 32232232.33}
+	var phones []*p.Party_PhoneNumber
+	phone := p.Party_PhoneNumber{Number: "123456789"}
+	phone.Type = p.Party_MOBILE
+	phones = append(phones, &phone)
+	party.Phones = phones
+
+	var req = p.PartyRequest{}
+	req.Party = &party
+	return &req
+}
+
+func TestCreateParty(t *testing.T) {
+	svc := service.PartyService{}
+	pty, err := svc.CreateParty(nil, data())
+	if err != nil && pty.Id < 0 {
+		t.Errorf("wanted %b got %s", pty.Id, "0")
+	}
+}
+
+/* func TestPartyCreateRPC(t *testing.T) {
 
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
@@ -48,20 +73,4 @@ func TestPartyCreate(t *testing.T) {
 	}
 
 	log.Println(res.PartyId)
-}
-
-/* func TestMarshalPropsal(t *testing.T) {
-	pp := Party{FirstName: "Prashant", LastName: "Patel",
-		MobileNumber: "1234567890", Email: "primary@gmail.com",
-		PanNumber: "AJBDD12345G", Relationship: "self", Gender: "m",
-		Address: "Mumbai", DataOfBirth: "14/01/1977", SumInsured: 12000}
-	mother := Party{FirstName: "Usha", LastName: "Patel",
-		MobileNumber: "1234567890", Email: "Nominee@gmail.com",
-		PanNumber: "AJBDD12345G", Relationship: "mother", Gender: "f", Address: "Mumbai",
-		DataOfBirth: "19/01/1956", SumInsured: 12000}
-	proposal := Proposal{Premium: 3000, Pid: "12345678"}
-	proposal.Party = append(proposal.Party, pp)
-	proposal.Party = append(proposal.Party, mother)
-	data, _ := json.Marshal(proposal)
-	log.Println(string(data))
 } */
