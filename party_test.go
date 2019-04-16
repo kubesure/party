@@ -5,7 +5,7 @@ import (
 	service "github.com/kubesure/party/service/v1"
 	//"golang.org/x/net/context"
 	//"google.golang.org/grpc"
-	//"log"
+	"log"
 	"testing"
 )
 
@@ -33,7 +33,20 @@ func TestCreateParty(t *testing.T) {
 	svc := service.PartyService{}
 	pty, err := svc.CreateParty(nil, data())
 	if err != nil && pty.Id < 0 {
-		t.Errorf("wanted %b got %s", pty.Id, "0")
+		t.Errorf("wanted %b got %s", pty.Id, "Patel")
+	}
+}
+
+func TestGetParty(t *testing.T) {
+	svc := service.PartyService{}
+	req := p.PartyRequest{}
+	req.Party = &p.Party{}
+	req.Party.Id = 7
+	party, err := svc.GetParty(nil, &req)
+	log.Println("gender ", party.Gender)
+	log.Println("phone type ", party.Phones[0].Type)
+	if err != nil && party.LastName == "Patel" {
+		t.Errorf("wanted %s got %s", "Patel", "nothing")
 	}
 }
 
