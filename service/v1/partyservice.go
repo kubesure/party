@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	party "github.com/kubesure/party/api/v1"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,7 +22,7 @@ type partyrec struct {
 	AddressLine1 string `bson:"addressLine1"`
 	AddressLine2 string `bson:"addressLine2"`
 	AddressLine3 string `bson:"addressLine3"`
-	PinCode      int    `bson:"pinCode"`
+	PinCode      int32  `bson:"pinCode"`
 	City         string `bson:"city"`
 	PanNumber    string `bson:"panNumber"`
 	Aadhaar      int64  `bson:"aadhaar"`
@@ -32,7 +33,7 @@ type PartyService struct{}
 
 var mongopartysvc = os.Getenv("mongopartysvc")
 
-func decode(request *party.PartyRequest) bson.M {
+func encode(request *party.PartyRequest) bson.M {
 	return bson.M{
 		"partyId": request.Party.Id, "firstName": request.Party.FirstName, "lastName": request.Party.FirstName,
 		"gender": request.Party.Gender, "email": request.Party.Email, "dateOfBirth": request.Party.DataOfBirth,
@@ -50,7 +51,7 @@ func (s *PartyService) CreateParty(ctx context.Context, request *party.PartyRequ
 		return nil, err
 	}
 	request.Party.Id = id
-	rec := decode(request)
+	rec := encode(request)
 	client, err := conn()
 	defer client.Disconnect(context.Background())
 	if err != nil {
@@ -110,11 +111,45 @@ func (s *PartyService) GetParty(ctx context.Context, request *party.PartyRequest
 
 //UpdateParty updates an individual party
 func (s *PartyService) UpdateParty(ctx context.Context, request *party.PartyRequest) (*party.Party, error) {
-	log.Println(request.Party.FirstName)
-	log.Println(request.Party.Gender)
-	log.Println(request.Party.Phones[0].Number)
-	log.Println(request.Party.Phones[0].Type)
-	request.Party.Id = 1234566
+
+	client, err := conn()
+	defer client.Disconnect(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.D{
+		{"partyId", request.Party.Id},
+	}
+	data := bson.D{{"$set", bson.D{
+		{"firstName", request.Party.FirstName},
+		{"lastName", request.Party.LastName},
+		{"gender", request.Party.Gender},
+		{"email", request.Party.Email},
+		{"dateOfBirth", request.Party.DataOfBirth},
+		{"mobileNumber", request.Party.Phones[0].Number},
+		{"addressLine1", request.Party.AddressLine1},
+		{"addressLine2", request.Party.AddressLine2},
+		{"addressLine3", request.Party.AddressLine3},
+		{"pinCode", request.Party.PinCode},
+		{"city", request.Party.City},
+		{"latitude", request.Party.Latitude},
+		{"longitude", request.Party.Longitude},
+		{"panNumber", request.Party.PanNumber},
+		{"aadhaar", request.Party.Aadhaar},
+	}}}
+
+	coll := client.Database("parties").Collection("party")
+	result, errupdate := coll.UpdateOne(context.Background(), filter, data)
+
+	if errupdate != nil {
+		return nil, errupdate
+	}
+	log.Println("Matched count ", result.MatchedCount)
+	log.Println("Modified count ", result.ModifiedCount)
+	if result.MatchedCount == 0 {
+		return nil, fmt.Errorf("party record not updated")
+	}
 	return request.Party, nil
 }
 

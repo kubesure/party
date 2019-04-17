@@ -50,6 +50,18 @@ func TestGetParty(t *testing.T) {
 	}
 }
 
+func TestUpdateParty(t *testing.T) {
+	svc := service.PartyService{}
+	req := data()
+	req.Party.Id = 8
+	req.Party.FirstName = "Thomas"
+	req.Party.LastName = "Earl"
+	_, err := svc.UpdateParty(nil, req)
+	if err != nil {
+		t.Errorf(err.Error(), nil)
+	}
+}
+
 /* func TestPartyCreateRPC(t *testing.T) {
 
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
