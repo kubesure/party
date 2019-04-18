@@ -3,8 +3,8 @@ package main
 import (
 	p "github.com/kubesure/party/api/v1"
 	service "github.com/kubesure/party/service/v1"
-	//"golang.org/x/net/context"
-	//"google.golang.org/grpc"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
 	"log"
 	"testing"
 )
@@ -62,7 +62,7 @@ func TestUpdateParty(t *testing.T) {
 	}
 }
 
-/* func TestPartyCreateRPC(t *testing.T) {
+func TestPartyCreateRPC(t *testing.T) {
 
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
@@ -71,9 +71,9 @@ func TestUpdateParty(t *testing.T) {
 	defer conn.Close()
 	c := p.NewPartyServiceClient(conn)
 
-	party := p.Party{FirstName: "Gopher bikertales", LastName: "Patel", Aadhaar: "12222",
+	party := p.Party{FirstName: "Gopher bikertales", LastName: "Patel", Aadhaar: 12222,
 		Gender: p.Party_FEMALE}
-	party.Address = "Ghatkopar"
+	party.AddressLine1 = "Ghatkopar"
 	party.DataOfBirth = "12-09-1856"
 	party.Email = "pras.p.in@gmail.com"
 	party.PanNumber = "12322232fff"
@@ -93,9 +93,9 @@ func TestUpdateParty(t *testing.T) {
 		log.Fatalf("error calling: %v", err)
 	}
 
-	if res.PartyId < 0 {
-		t.Errorf("wanted %b got %s", res.PartyId, "122222")
+	if res.Id < 0 {
+		t.Errorf("wanted %b got %s", res.Id, "122222")
 	}
 
-	log.Println(res.PartyId)
-} */
+	log.Println(res.Id)
+}
