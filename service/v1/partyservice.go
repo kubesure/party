@@ -41,7 +41,7 @@ func encode(request *party.PartyRequest) bson.M {
 		"addressLine2": request.Party.AddressLine2, "addressLine3": request.Party.AddressLine3,
 		"pinCode": request.Party.PinCode, "city": request.Party.City, "latitude": request.Party.Latitude,
 		"longitude": request.Party.Longitude, "panNumber": request.Party.PanNumber,
-		"aadhaar": request.Party.Aadhaar}
+		"aadhaar": request.Party.Aadhaar, "createdDate": time.Now().String()}
 }
 
 //CreateParty creates a party
@@ -64,6 +64,7 @@ func (s *PartyService) CreateParty(ctx context.Context, request *party.PartyRequ
 		log.Println("errcol")
 		return nil, errcol
 	}
+
 	return request.Party, nil
 }
 
@@ -80,7 +81,6 @@ func (s *PartyService) GetParty(ctx context.Context, request *party.PartyRequest
 	result := coll.FindOne(context.Background(), filter)
 	errdecode := result.Decode(&rec)
 	if errdecode != nil {
-		log.Println("errdecode")
 		return nil, errdecode
 	}
 	request.Party.FirstName = rec.FirstName
@@ -137,6 +137,7 @@ func (s *PartyService) UpdateParty(ctx context.Context, request *party.PartyRequ
 		{"longitude", request.Party.Longitude},
 		{"panNumber", request.Party.PanNumber},
 		{"aadhaar", request.Party.Aadhaar},
+		{"updatedDate", time.Now().String()},
 	}}}
 
 	coll := client.Database("parties").Collection("party")
@@ -145,10 +146,8 @@ func (s *PartyService) UpdateParty(ctx context.Context, request *party.PartyRequ
 	if errupdate != nil {
 		return nil, errupdate
 	}
-	log.Println("Matched count ", result.MatchedCount)
-	log.Println("Modified count ", result.ModifiedCount)
-	if result.MatchedCount == 0 {
-		return nil, fmt.Errorf("party record not updated")
+	if result.ModifiedCount == 0 {
+		return nil, fmt.Errorf("party not updated")
 	}
 	return request.Party, nil
 }
