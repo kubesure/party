@@ -50,7 +50,7 @@ func (s *PartyService) CreateParty(ctx context.Context, request *party.PartyRequ
 	if err != nil {
 		return nil, err
 	}
-	request.Party.Id = id
+	request.Party.Id = int64(id)
 	rec := encode(request)
 	client, err := conn()
 	defer client.Disconnect(context.Background())
@@ -152,7 +152,7 @@ func (s *PartyService) UpdateParty(ctx context.Context, request *party.PartyRequ
 	return request.Party, nil
 }
 
-func nextid() (int64, error) {
+func nextid() (int, error) {
 	client, err := conn()
 	defer client.Disconnect(context.Background())
 	if err != nil {
@@ -166,7 +166,7 @@ func nextid() (int64, error) {
 	result := coll.FindOneAndUpdate(context.Background(), filter, update, &opt)
 	type record struct {
 		PartyID string `bson:"partytid"`
-		Value   int64  `bson:"value"`
+		Value   int    `bson:"value"`
 	}
 	var data record
 	errdecode := result.Decode(&data)
