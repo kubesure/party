@@ -16,7 +16,7 @@ spec:
   template:
     metadata:
       labels:
-        app: mongo
+        app: mongo:3-xenial
         role: master
         tier: backend
     spec:
