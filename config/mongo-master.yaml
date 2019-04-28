@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: mongo
+    app: mongo-party
     role: master
     tier: backend
   name: mongo-master-party
@@ -10,13 +10,13 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mongo
+      app: mongo-party
       role: master
       tier: backend
   template:
     metadata:
       labels:
-        app: mongo
+        app: mongo-party
         role: master
         tier: backend
     spec:
