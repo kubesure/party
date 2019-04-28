@@ -46,14 +46,16 @@ func encode(request *party.PartyRequest) bson.M {
 
 //CreateParty creates a party
 func (s *PartyService) CreateParty(ctx context.Context, request *party.PartyRequest) (*party.Party, error) {
-	id, err := nextid()
+	client, err := conn()
+	defer client.Disconnect(context.Background())
+
+	id, err := nextid(client)
 	if err != nil {
 		return nil, err
 	}
 	request.Party.Id = int64(id)
 	rec := encode(request)
-	client, err := conn()
-	defer client.Disconnect(context.Background())
+
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +66,6 @@ func (s *PartyService) CreateParty(ctx context.Context, request *party.PartyRequ
 		log.Println("errcol")
 		return nil, errcol
 	}
-
 	return request.Party, nil
 }
 
@@ -111,7 +112,6 @@ func (s *PartyService) GetParty(ctx context.Context, request *party.PartyRequest
 
 //UpdateParty updates an individual party
 func (s *PartyService) UpdateParty(ctx context.Context, request *party.PartyRequest) (*party.Party, error) {
-
 	client, err := conn()
 	defer client.Disconnect(context.Background())
 	if err != nil {
@@ -152,13 +152,8 @@ func (s *PartyService) UpdateParty(ctx context.Context, request *party.PartyRequ
 	return request.Party, nil
 }
 
-func nextid() (int, error) {
-	client, err := conn()
-	defer client.Disconnect(context.Background())
-	if err != nil {
-		return 0, err
-	}
-	coll := client.Database("parties").Collection("counter")
+func nextid(c *mongo.Client) (int, error) {
+	coll := c.Database("parties").Collection("counter")
 	filter := bson.M{"_id": "partyid"}
 	update := bson.M{"$inc": bson.M{"value": 1}}
 	aft := options.After
@@ -171,7 +166,7 @@ func nextid() (int, error) {
 	var data record
 	errdecode := result.Decode(&data)
 	if errdecode != nil {
-		return 0, err
+		return 0, errdecode
 	}
 	return data.Value, nil
 }
