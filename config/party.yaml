@@ -21,7 +21,12 @@ spec:
         tier: backend
     spec:
       containers:
-      - image: party:v1
+      - image: party:debug
         name: party
         ports:
         - containerPort: 50051
+        env:
+        - name: mongopartysvc
+          value: mongopartysvc 
+        command: ["/bin/sh"]
+        args: ["-c", "while true; do echo hello; sleep 10;done"]
