@@ -4,7 +4,7 @@ metadata:
   labels:
     app: party
     role: business
-    type: backend
+    tier: backend
   name: party
 spec:
   replicas: 1
@@ -12,13 +12,13 @@ spec:
     matchLabels:
       app: party
       role: business
-      type: backend
+      tier: backend
   template:
     metadata:
       labels:
         app: party
         role: business
-        type: backend
+        tier: backend
     spec:
       containers:
       - image: party:v1
