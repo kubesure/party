@@ -14,8 +14,8 @@ Mongodb v4, GRPC, Golang
 1. create db party 
     ```
        use parties
-       db.parties.counter.insert({"_id" : "partyid" , "value": 0 })
-       db.parties.counter.find({}).pretty()
+       db.counter.insert({"_id" : "partyid" , "value": 0 })
+       db.counter.find({}).pretty()
     ```
 2. Run party and quote 
    ``` go run ../quote/quote.go
