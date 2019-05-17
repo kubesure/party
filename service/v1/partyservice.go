@@ -3,13 +3,14 @@ package v1
 import (
 	"context"
 	"fmt"
+	"os"
+	"time"
+
 	party "github.com/kubesure/party/api/v1"
+	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
-	"os"
-	"time"
 )
 
 type partyrec struct {
@@ -33,6 +34,13 @@ type PartyService struct{}
 
 var mongopartysvc = os.Getenv("mongopartysvc")
 
+func init() {
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetLevel(log.DebugLevel)
+	log.SetOutput(os.Stdout)
+	log.SetReportCaller(true)
+}
+
 func encode(request *party.PartyRequest) bson.M {
 	return bson.M{
 		"partyId": request.Party.Id, "firstName": request.Party.FirstName, "lastName": request.Party.FirstName,
@@ -51,19 +59,21 @@ func (s *PartyService) CreateParty(ctx context.Context, request *party.PartyRequ
 
 	id, err := nextid(client)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	request.Party.Id = int64(id)
 	rec := encode(request)
 
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	coll := client.Database("parties").Collection("party")
 	_, errcol := coll.InsertOne(context.Background(), rec)
 
 	if errcol != nil {
-		log.Println("errcol")
+		log.Error(errcol)
 		return nil, errcol
 	}
 	return request.Party, nil
@@ -74,6 +84,7 @@ func (s *PartyService) GetParty(ctx context.Context, request *party.PartyRequest
 	client, err := conn()
 	defer client.Disconnect(context.Background())
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	coll := client.Database("parties").Collection("party")
@@ -82,6 +93,7 @@ func (s *PartyService) GetParty(ctx context.Context, request *party.PartyRequest
 	result := coll.FindOne(context.Background(), filter)
 	errdecode := result.Decode(&rec)
 	if errdecode != nil {
+		log.Error(err)
 		return nil, errdecode
 	}
 	request.Party.FirstName = rec.FirstName
@@ -106,7 +118,6 @@ func (s *PartyService) GetParty(ctx context.Context, request *party.PartyRequest
 	phone.Type = party.Party_MOBILE
 	phones = append(phones, &phone)
 	request.Party.Phones = phones
-	log.Println(request.Party)
 	return request.Party, nil
 }
 
@@ -115,6 +126,7 @@ func (s *PartyService) UpdateParty(ctx context.Context, request *party.PartyRequ
 	client, err := conn()
 	defer client.Disconnect(context.Background())
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 
@@ -144,9 +156,11 @@ func (s *PartyService) UpdateParty(ctx context.Context, request *party.PartyRequ
 	result, errupdate := coll.UpdateOne(context.Background(), filter, data)
 
 	if errupdate != nil {
+		log.Error(err)
 		return nil, errupdate
 	}
 	if result.ModifiedCount == 0 {
+		log.Error("party not updated")
 		return nil, fmt.Errorf("party not updated")
 	}
 	return request.Party, nil
@@ -166,6 +180,7 @@ func nextid(c *mongo.Client) (int, error) {
 	var data record
 	errdecode := result.Decode(&data)
 	if errdecode != nil {
+		log.Error(errdecode)
 		return 0, errdecode
 	}
 	return data.Value, nil
@@ -177,6 +192,7 @@ func conn() (*mongo.Client, error) {
 	client, _ := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+mongopartysvc+":27017"))
 	err := client.Ping(ctx, nil)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	return client, nil

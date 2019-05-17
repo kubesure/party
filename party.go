@@ -2,21 +2,29 @@ package main
 
 import (
 	"context"
-	api "github.com/kubesure/party/api/v1"
-	service "github.com/kubesure/party/service/v1"
-	"google.golang.org/grpc"
-	"log"
 	"net"
 	"os"
 	"os/signal"
+
+	api "github.com/kubesure/party/api/v1"
+	service "github.com/kubesure/party/service/v1"
+	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
 )
 
 const (
 	port = ":50051"
 )
 
+func init() {
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetLevel(log.DebugLevel)
+	log.SetOutput(os.Stdout)
+	log.SetReportCaller(true)
+}
+
 func main() {
-	log.Println("party server on...")
+	log.Info("party server on...")
 	ctx := context.Background()
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
@@ -32,7 +40,7 @@ func main() {
 
 	go func() {
 		for range c {
-			log.Print("shutting down party server...")
+			log.Info("shutting down party server...")
 			s.GracefulStop()
 			<-ctx.Done()
 		}
