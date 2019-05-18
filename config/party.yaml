@@ -21,12 +21,10 @@ spec:
         tier: backend
     spec:
       containers:
-      - image: party:debug
+      - image: party:v1 
         name: party
         ports:
         - containerPort: 50051
         env:
         - name: mongopartysvc
-          value: mongopartysvc 
-        command: ["/bin/sh"]
-        args: ["-c", "while true; do echo hello; sleep 10;done"]
+          value: mongo-party-0.mongopartysvc.default.svc.cluster.local:27017,mongo-party-1.mongopartysvc.default.svc.cluster.local:27017,mongo-party-2.mongopartysvc.default.svc.cluster.local:27017
