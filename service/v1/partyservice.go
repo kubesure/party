@@ -189,7 +189,8 @@ func nextid(c *mongo.Client) (int, error) {
 func conn() (*mongo.Client, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	client, _ := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+mongopartysvc+":27017"))
+	uri := "mongodb://" + mongopartysvc + "/?replicaSet=rs0"
+	client, _ := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	err := client.Ping(ctx, nil)
 	if err != nil {
 		log.Error(err)
