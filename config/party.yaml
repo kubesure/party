@@ -27,4 +27,23 @@ spec:
         - containerPort: 50051
         env:
         - name: mongopartysvc
-          value: mongo-party-0.mongopartysvc.default.svc.cluster.local:27017,mongo-party-1.mongopartysvc.default.svc.cluster.local:27017,mongo-party-2.mongopartysvc.default.svc.cluster.local:27017
+          value: mongo-party-0.mongopartysvc:27017,mongo-party-1.mongopartysvc:27017,mongo-party-2.mongopartysvc:27017
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: party
+    role: business
+    tier: backend
+  name: partysvc
+spec:
+  ports:
+  - port: 50051
+    protocol: TCP
+    targetPort: 50051
+    name: grpc-party
+  selector:
+    app: party
+    role: business
+    tier: backend
