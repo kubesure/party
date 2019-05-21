@@ -16,6 +16,7 @@ Mongodb v4, GRPC, Golang
        use parties
        db.counter.insert({"_id" : "partyid" , "value": 0 })
        db.counter.find({}).pretty()
+       db.party.find({}).pretty()
     ```
 2. Run party and quote 
    ``` go run ../quote/quote.go
@@ -74,3 +75,8 @@ curl -i -X POST \
 }                                               \'
 ```
 
+rs.initiate({ _id: "rs0", members:[ 
+        { _id: 0, host: "mongo-party-0.mongopartysvc:27017" },
+        { _id: 1, host: "mongo-party-1.mongopartysvc:27017" },
+        { _id: 2, host: "mongo-party-2.mongopartysvc:27017" },
+]});
