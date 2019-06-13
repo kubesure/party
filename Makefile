@@ -8,6 +8,7 @@ DOCKER=docker
 DBUILD=$(DOCKER) build
 DTAG= $(DOCKER) tag
 DPUSH= $(DOCKER) push
+GOBINARYDIR=/home/ubuntu/go/bin
 
 BINARY_NAME=party
 BINARY_VERSION=v0.2
@@ -21,22 +22,23 @@ pull:
 
 .PHONY: build # - Builds linux arch go binary
 build:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BINARY_UNIX) -v ./...
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -v ./...
 
 .PHONY: install  # - Installs go service
-install:
-	$(GOINSTALL) -o $(BINARY_UNIX)
+install: 
+	$(GOINSTALL)
 
 .PHONY: run # - Runs the service without build
 run:
 	$(GORUN) $(BINARY_NAME).go
 
-.PHONY: run-install # - Runs the service without build
-run-install:
-	$(BINARY_NAME)
+.PHONY: run-install # - Runs the service from go bin 
+run-install: build 
+
+	$(GOBINARYDIR)/$(BINARY_NAME)
 
 .PHONY: dbuild  # - Builds docker image
-dbuild:
+dbuild: build
 	$(DBUILD) . -t $(TAG_LOCAL)
 
 .PHONY: dtag # - Tags local image to docker hub tag
