@@ -8,8 +8,7 @@ DOCKER=docker
 DBUILD=$(DOCKER) build
 DTAG= $(DOCKER) tag
 DPUSH= $(DOCKER) push
-GOBINARYDIR=/home/ubuntu/go/bin
-
+GOBINARYDIR=$(HOME)/go/bin
 BINARY_NAME=party
 BINARY_VERSION=v0.2
 BINARY_UNIX=$(BINARY_NAME)
