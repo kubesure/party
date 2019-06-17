@@ -10,6 +10,7 @@ import (
 	service "github.com/kubesure/party/service/v1"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 const (
@@ -34,6 +35,7 @@ func main() {
 	s := grpc.NewServer()
 	svc := &service.PartyService{}
 	api.RegisterPartyServiceServer(s, svc)
+	reflection.Register(s)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
