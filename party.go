@@ -6,10 +6,13 @@ import (
 	"os"
 	"os/signal"
 
+	"google.golang.org/grpc/health"
+
 	api "github.com/kubesure/party/api/v1"
 	service "github.com/kubesure/party/service/v1"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -33,9 +36,14 @@ func main() {
 	}
 
 	s := grpc.NewServer()
+
 	svc := &service.PartyService{}
 	api.RegisterPartyServiceServer(s, svc)
 	reflection.Register(s)
+
+	h := health.NewServer()
+	h.SetServingStatus("party", healthpb.HealthCheckResponse_SERVING)
+	healthpb.RegisterHealthServer(s, h)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
