@@ -42,7 +42,7 @@ func main() {
 	reflection.Register(s)
 
 	h := health.NewServer()
-	h.SetServingStatus("party", healthpb.HealthCheckResponse_SERVING)
+	h.SetServingStatus("", healthpb.HealthCheckResponse_SERVING)
 	healthpb.RegisterHealthServer(s, h)
 
 	c := make(chan os.Signal, 1)
