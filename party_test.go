@@ -1,12 +1,13 @@
 package main
 
 import (
+	"log"
+	"testing"
+
 	p "github.com/kubesure/party/api/v1"
 	service "github.com/kubesure/party/service/v1"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"log"
-	"testing"
 )
 
 const (
@@ -41,7 +42,7 @@ func TestGetParty(t *testing.T) {
 	svc := service.PartyService{}
 	req := p.PartyRequest{}
 	req.Party = &p.Party{}
-	req.Party.Id = 7
+	req.Party.Id = 25
 	party, err := svc.GetParty(nil, &req)
 	log.Println("gender ", party.Gender)
 	log.Println("phone type ", party.Phones[0].Type)
