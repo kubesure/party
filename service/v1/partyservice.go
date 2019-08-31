@@ -14,19 +14,21 @@ import (
 )
 
 type partyrec struct {
-	FirstName    string `bson:"firstName"`
-	LastName     string `bson:"lastName"`
-	Gender       int    `bson:"gender"`
-	DataOfBirth  string `bson:"dateOfBirth"`
-	Email        string `bson:"email"`
-	MobileNumber string `bson:"mobileNumber"`
-	AddressLine1 string `bson:"addressLine1"`
-	AddressLine2 string `bson:"addressLine2"`
-	AddressLine3 string `bson:"addressLine3"`
-	PinCode      int32  `bson:"pinCode"`
-	City         string `bson:"city"`
-	PanNumber    string `bson:"panNumber"`
-	Aadhaar      int64  `bson:"aadhaar"`
+	FirstName    string  `bson:"firstName"`
+	LastName     string  `bson:"lastName"`
+	Gender       int     `bson:"gender"`
+	DataOfBirth  string  `bson:"dateOfBirth"`
+	Email        string  `bson:"email"`
+	MobileNumber string  `bson:"mobileNumber"`
+	AddressLine1 string  `bson:"addressLine1"`
+	AddressLine2 string  `bson:"addressLine2"`
+	AddressLine3 string  `bson:"addressLine3"`
+	PinCode      int32   `bson:"pinCode"`
+	City         string  `bson:"city"`
+	PanNumber    string  `bson:"panNumber"`
+	Aadhaar      int64   `bson:"aadhaar"`
+	Latitude     float64 `bson:"latitude"`
+	Longitude    float64 `bson:"longitude"`
 }
 
 //PartyService to host a party service
@@ -118,6 +120,8 @@ func (s *PartyService) GetParty(ctx context.Context, request *party.PartyRequest
 	phone.Type = party.Party_MOBILE
 	phones = append(phones, &phone)
 	request.Party.Phones = phones
+	request.Party.Latitude = rec.Latitude
+	request.Party.Longitude = rec.Longitude
 	return request.Party, nil
 }
 
