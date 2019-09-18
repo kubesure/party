@@ -13,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+//struct that represent a document in mongodb
 type partyrec struct {
 	FirstName    string  `bson:"firstName"`
 	LastName     string  `bson:"lastName"`
@@ -43,6 +44,7 @@ func init() {
 	log.SetReportCaller(true)
 }
 
+//Converts json request to go primitives.
 func encode(request *party.PartyRequest) bson.M {
 	return bson.M{
 		"partyId": request.Party.Id, "firstName": request.Party.FirstName, "lastName": request.Party.FirstName,
@@ -170,6 +172,7 @@ func (s *PartyService) UpdateParty(ctx context.Context, request *party.PartyRequ
 	return request.Party, nil
 }
 
+//Generates incremental ID for party
 func nextid(c *mongo.Client) (int, error) {
 	coll := c.Database("parties").Collection("counter")
 	filter := bson.M{"_id": "partyid"}

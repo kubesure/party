@@ -27,6 +27,7 @@ func init() {
 	log.SetReportCaller(true)
 }
 
+//starts a party service server and an health check server for k8s readiness probes.
 func main() {
 	log.Info("party server on...")
 	ctx := context.Background()
