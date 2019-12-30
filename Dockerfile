@@ -1,4 +1,4 @@
-FROM golang:1.12.7-alpine AS builder
+FROM golang:1.12.4-alpine AS builder
 ENV GOBIN=/go/bin
 WORKDIR /go/src/github.com/kubesure/party
 COPY . .
