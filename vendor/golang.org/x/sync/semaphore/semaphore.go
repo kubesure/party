@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package semaphore provides a weighted semaphore implementation.
-package semaphore
+package semaphore // import "golang.org/x/sync/semaphore"
 
 import (
 	"container/list"
@@ -95,7 +95,7 @@ func (s *Weighted) Release(n int64) {
 	s.cur -= n
 	if s.cur < 0 {
 		s.mu.Unlock()
-		panic("semaphore: bad release")
+		panic("semaphore: released more than held")
 	}
 	for {
 		next := s.waiters.Front()
